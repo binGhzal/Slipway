@@ -40,3 +40,7 @@ templates
 
 Copy these templates and adjust them for your own applications.
 
+## Development Plan and Roadmap
+
+See [PROJECT_PLAN.md](docs/PROJECT_PLAN.md) for the repository structure, development guidelines, and future roadmap.
+
