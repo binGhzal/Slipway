@@ -18,7 +18,25 @@ Security defaults: restricted Pod Security and default-deny NetworkPolicy.
 
 ```
 Project -> App -> Release
-         |            
+         |
          -> Plugins (capabilities)
 ```
+
+## Templates
+
+Ready-made Kubernetes manifests are available in the [templates](templates/) directory to help you bootstrap apps quickly. The structure keeps configuration organized and can be adopted by GitOps tools like Flux in the future.
+
+```
+templates
+├── bootstrap
+│   ├── helmrepositories
+│   │   └── helmrepository-podinfo.yaml
+│   └── namespaces
+│       └── namespace-podinfo.yaml
+└── podinfo
+    ├── configmap-podinfo-helm-chart-value-overrides.yaml
+    └── helmrelease-podinfo.yaml
+```
+
+Copy these templates and adjust them for your own applications.
 
