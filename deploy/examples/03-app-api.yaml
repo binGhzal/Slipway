@@ -1,0 +1,32 @@
+---
+apiVersion: paas.slipway.dev/v1
+kind: App
+metadata:
+  name: api
+  namespace: acme
+spec:
+  source:
+    repo: https://github.com/slipway-demo/api.git
+    branch: main
+    build:
+      strategy: buildkit
+      dockerfile: ./Dockerfile
+      context: .
+  runtime:
+    replicas: 2
+    ports:
+      - name: http
+        containerPort: 8080
+    env:
+      - name: RUST_LOG
+        value: info
+  route:
+    host: api.acme.nip.io
+    tls: true
+  autoscaling:
+    enabled: true
+    min: 2
+    max: 10
+    policy:
+      type: cpu
+      target: 70
