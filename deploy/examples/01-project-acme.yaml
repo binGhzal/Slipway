@@ -1,0 +1,12 @@
+---
+apiVersion: paas.slipway.dev/v1
+kind: Project
+metadata:
+  name: acme
+spec:
+  domains:
+    base: acme.nip.io
+  networkPolicy: defaultDeny
+  quotas:
+    cpu: "8"
+    memory: "16Gi"

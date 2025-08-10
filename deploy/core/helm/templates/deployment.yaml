@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slipway-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slipway-controller
+  template:
+    metadata:
+      labels:
+        app: slipway-controller
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name | default "slipway-controller" }}
+      containers:
+        - name: controller
+          image: {{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}
+          args:
+            - "--mode={{ .Values.mode }}"

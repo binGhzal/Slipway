@@ -1,0 +1,10 @@
+controller:
+  image:
+    repository: slipway/controller
+    tag: latest
+serviceAccount:
+  create: true
+  name: ""
+rbac:
+  create: true
+mode: direct
