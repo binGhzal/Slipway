@@ -3,3 +3,5 @@ secrets.*
 
 # System files
 .DS_Store
+Thumbs.db
+downloaded_iso_path

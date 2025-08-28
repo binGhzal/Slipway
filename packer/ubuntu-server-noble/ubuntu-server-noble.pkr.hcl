@@ -52,10 +52,10 @@ source "proxmox-iso" "ubuntu-server-noble" {
     # (Option 2) Download ISO
     boot_iso {
          type             = "scsi"
-         iso_url          = "https://releases.ubuntu.com/24.04/ubuntu-24.04-live-server-amd64.iso"
+         iso_url          = "https://releases.ubuntu.com/24.04.3/ubuntu-24.04.3-live-server-amd64.iso"
          unmount          = true
          iso_storage_pool = "local"
-         iso_checksum     = "file:https://releases.ubuntu.com/noble/SHA256SUMS"
+         iso_checksum     = "file:https://releases.ubuntu.com/24.04/SHA256SUMS"
      }
 
     # VM System Settings
@@ -67,7 +67,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
     disks {
         disk_size         = "25G"
         format            = "qcow2"
-        storage_pool      = ${local.disk_storage}
+        storage_pool      = "${local.disk_storage}"
         type              = "virtio"
     }
 
@@ -86,7 +86,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
 
     # VM Cloud-Init Settings
     cloud_init              = true
-    cloud_init_storage_pool = ${local.disk_storage}
+    cloud_init_storage_pool = "${local.disk_storage}"
 
     # PACKER Boot Commands
     boot         = "c"
@@ -113,7 +113,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
     # http_port_min           = 8802
     # http_port_max           = 8802
 
-    ssh_username            = "your-user-name"
+    ssh_username            = "ubuntu"
 
     # (Option 1) Add your Password here
     # ssh_password        = "your-password"
@@ -150,7 +150,7 @@ build {
 
     # Provisioning the VM Template for Cloud-Init Integration in Proxmox #2
     provisioner "file" {
-        source      = "files/99-pve.cfg"
+        source      = "ubuntu-server-noble/files/99-pve.cfg"
         destination = "/tmp/99-pve.cfg"
     }
 
