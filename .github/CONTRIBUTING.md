@@ -1,4 +1,4 @@
-# Welcome to contributing at The Digital Life.🤝
+# Welcome to contributing
 
 - Products continuously change over time, specially those that are in high demand.
 
