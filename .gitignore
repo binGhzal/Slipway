@@ -1,12 +1,10 @@
-# sensitive files
-secrets.*
+# Ignore local development files
+**/.vscode
+**/.DS_Store
 
-# System files
-.DS_Store
-Thumbs.db
-downloaded_iso_path
-.vscode
+# Docker Secrets, Environment Files
+**/secrets.*
+**/.env
 
-# Ansible Vault files
-*.vault
-.ansible
+# Ignore Ansible
+**/.ansible
