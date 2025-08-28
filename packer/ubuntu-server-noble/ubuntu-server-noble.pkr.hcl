@@ -45,7 +45,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
     # (Option 1) Local ISO File
      boot_iso {
          type         = "scsi"
-         iso_file     = "local:iso/ubuntu-24.04.03-live-server-amd64.iso"
+         iso_file     = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
          unmount      = true
          iso_checksum = "c3514bf0056180d09376462a7a1b4f213c1d6e8ea67fae5c25099c6fd3d8274b"
      }
