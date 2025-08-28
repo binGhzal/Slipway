@@ -43,20 +43,20 @@ source "proxmox-iso" "ubuntu-server-noble" {
 
     # VM OS Settings
     # (Option 1) Local ISO File
-    # boot_iso {
-    #     type         = "scsi"
-    #     iso_file     = "local:iso/ubuntu-24.04-live-server-amd64.iso"
-    #     unmount      = true
-    #     iso_checksum = "e240e4b801f7bb68c20d1356b60968ad0c33a41d00d828e74ceb3364a0317be9"
-    # }
-    # (Option 2) Download ISO
-    boot_iso {
-         type             = "scsi"
-         iso_url          = "https://releases.ubuntu.com/24.04.3/ubuntu-24.04.3-live-server-amd64.iso"
-         unmount          = true
-         iso_storage_pool = "local"
-         iso_checksum     = "file:https://releases.ubuntu.com/24.04/SHA256SUMS"
+     boot_iso {
+         type         = "scsi"
+         iso_file     = "local:iso/ubuntu-24.04.03-live-server-amd64.iso"
+         unmount      = true
+         iso_checksum = "c3514bf0056180d09376462a7a1b4f213c1d6e8ea67fae5c25099c6fd3d8274b"
      }
+    # (Option 2) Download ISO
+    # boot_iso {
+    #      type             = "scsi"
+    #      iso_url          = "https://releases.ubuntu.com/24.04.3/ubuntu-24.04.3-live-server-amd64.iso"
+    #      unmount          = true
+    #      iso_storage_pool = "local"
+    #      iso_checksum     = "file:https://releases.ubuntu.com/24.04/SHA256SUMS"
+    #  }
 
     # VM System Settings
     qemu_agent = true
@@ -66,7 +66,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
 
     disks {
         disk_size         = "25G"
-        format            = "qcow2"
+        format            = "raw"
         storage_pool      = "${local.disk_storage}"
         type              = "virtio"
     }
@@ -119,7 +119,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
     # ssh_password        = "your-password"
     # - or -
     # (Option 2) Add your Private SSH KEY file here
-    # ssh_private_key_file    = "~/.ssh/id_rsa"
+    ssh_private_key_file    = "~/.ssh/id_rsa"
 
     # Raise the timeout, when installation takes longer
     ssh_timeout             = "30m"
