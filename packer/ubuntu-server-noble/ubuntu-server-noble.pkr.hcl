@@ -40,6 +40,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
     vm_id                = "9000"
     vm_name              = "ubuntu-server-noble"
     template_description = "Ubuntu Server Noble Image"
+    tags = "ubuntu;template;noble;linux"
 
     # VM OS Settings
     # (Option 1) Local ISO File
