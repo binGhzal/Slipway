@@ -1,0 +1,5 @@
+# sensitive files
+secrets.*
+
+# System files
+.DS_Store
