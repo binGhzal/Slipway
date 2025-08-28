@@ -28,5 +28,3 @@ packer {
 
 - If you have tailscale installed, be aware that packer could grab the IP of your tailscale adapter rather than your LAN. You can either hard code the IP in the boot command or try setting the `http_interface` option
 - Sometimes the boot command is typed too fast and can cause issues. You can increase the time between types by using the `boot_key_interval` option.
-
-openssl passwd -6 -salt xyz your_password
