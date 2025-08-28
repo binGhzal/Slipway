@@ -5,3 +5,8 @@ secrets.*
 .DS_Store
 Thumbs.db
 downloaded_iso_path
+.vscode
+
+# Ansible Vault files
+*.vault
+.ansible
