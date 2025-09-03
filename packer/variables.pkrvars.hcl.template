@@ -1,4 +1,0 @@
-proxmox_api_url = "https://0.0.0.0:8006/api2/json"  # Your Proxmox IP Address
-proxmox_api_token_id = "terraform@pam!terraform"  # API Token ID
-proxmox_api_token_secret = "your-api-token-secret" # Add your API Token Secret here
-proxmox_skip_tls_verify = "true" # Set to "true" to skip TLS verification (not recommended for production)
