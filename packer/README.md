@@ -23,7 +23,7 @@ packer {
 
 1. Fill in your Proxmox API credentials in the `variables.pkrvars.hcl` file.
 2. Navigate into the folder you want to create a template with, and edit the Packer template file (e.g., `ubuntu-server-noble.pkr.hcl`) and `http/user-data` file.
-3. Run `packer build -var-file ../variables.pkrvars.hcl .`
+3. Run `packer build -var-file=../variables.pkrvars.hcl .`
 
 ## Troubleshooting
 

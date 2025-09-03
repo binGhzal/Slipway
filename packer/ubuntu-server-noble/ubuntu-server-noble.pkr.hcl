@@ -22,7 +22,7 @@ variable "proxmox_skip_tls_verify" {
 }
 
 locals {
-    disk_storage = "bigdisk"
+    disk_storage = "local-lvm"
 }
 
 # Resource Definiation for the VM Template
@@ -36,7 +36,7 @@ source "proxmox-iso" "ubuntu-server-noble" {
     insecure_skip_tls_verify = "${var.proxmox_skip_tls_verify}"
 
     # VM General Settings
-    node                 = "proxmox"
+    node                 = "pve"
     vm_id                = "9000"
     vm_name              = "ubuntu-server-noble"
     template_description = "Ubuntu Server Noble Image"
