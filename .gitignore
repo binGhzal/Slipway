@@ -5,6 +5,8 @@
 # Docker Secrets, Environment Files
 **/secrets.*
 **/.env
+**/*.env
+**/*.kubeconfig
 
 # Ignore Ansible
 **/.ansible
