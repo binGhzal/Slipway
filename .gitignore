@@ -11,3 +11,4 @@
 
 # Ignore Ansible
 **/.ansible
+image-builder
