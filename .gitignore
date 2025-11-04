@@ -4,7 +4,7 @@
 **/image-builder/
 
 # Docker Secrets, Environment Files
-**/secrets.*
+**/secret.*
 **/.env
 **/*.env
 **/*.kubeconfig
