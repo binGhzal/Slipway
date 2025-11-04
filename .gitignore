@@ -1,6 +1,7 @@
 # Ignore local development files
 **/.vscode
 **/.DS_Store
+**/image-builder/
 
 # Docker Secrets, Environment Files
 **/secrets.*
