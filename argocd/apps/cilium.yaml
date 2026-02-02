@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cilium
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    chart: cilium
+    repoURL: https://helm.cilium.io/
+    targetRevision: 1.16.0
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        # We need to inject the values file content or map it from the git source if we were using a git source for the chart wrapper.
+        # However, for direct helm chart, we can't easily reference a local values file in another git repo unless we use a "Helm Chart from Git" pattern.
+        # To keep it simple, we will point this Application to the local path in the git repo that contains a Chart.yaml wrapper OR just embed values here.
+        # BETTTER APPROACH for GitOps: Point to the 'apps/cilium' directory in THIS repo, which will be a Helm Chart wrapper (Umbrella chart).
+    path: apps/cilium
+    repoURL: https://github.com/binGhzal/Slipway.git
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
