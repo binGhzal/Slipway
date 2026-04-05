@@ -16,5 +16,7 @@ spec:
     - 8.8.8.8
   allowedNodes:
     - pve
+  credentialsRef:
+    name: proxmox-credentials
   schedulerHints:
     memoryAdjustment: 0
