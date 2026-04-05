@@ -128,8 +128,14 @@ tasks:
           --namespace external-secrets --create-namespace \
           --values platform/external-secrets/values.yaml --wait --timeout 5m
       - |
-        echo "Creating bootstrap secret store credential..."
-        echo "ESO is installed. Configure your ClusterSecretStore after GitOps bootstrap."
+        echo "Creating 1Password Connect bootstrap credential..."
+        kubectl --kubeconfig {{.KUBECONFIG_MGMT}} create secret generic onepassword-connect-token \
+          --namespace external-secrets \
+          --from-literal=token=${OP_CONNECT_TOKEN} \
+          --dry-run=client -o yaml | kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f -
+      - |
+        kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f platform/external-secrets/secret-store.yaml
+        echo "ESO + 1Password Connect configured."
 
   # ============================================================
   # Pivot

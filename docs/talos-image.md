@@ -72,6 +72,7 @@ When a new Talos version is released:
 ## Current Configuration
 
 Save your schematic ID here for reference:
-- **Schematic ID:** `<fill in after creation>`
+- **Schematic ID:** `53513e54bb39202f35694412577a6bc53d484744d35a126e5d42ef34785c0d83`
+- **Extensions:** qemu-guest-agent, iscsi-tools, util-linux-tools
 - **Talos Version:** See `.env`
 - **Template VMID:** 9000
