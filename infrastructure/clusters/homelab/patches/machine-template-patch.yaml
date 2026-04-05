@@ -1,22 +1,12 @@
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
-kind: ProxmoxMachineTemplate
-metadata:
-  name: homelab-cp
-spec:
-  template:
-    spec:
-      sourceNode: pve
-      templateID: 9000
-      full: true
-      numSockets: 2
-      numCores: 4
-      memoryMiB: 16384
-      disks:
-        bootVolume:
-          disk: scsi0
-          sizeGb: 100
-      network:
-        default:
-          bridge: vmbr0
-          model: virtio
-          vlan: 2
+- op: replace
+  path: /metadata/name
+  value: homelab-cp
+- op: replace
+  path: /spec/template/spec/numCores
+  value: 4
+- op: replace
+  path: /spec/template/spec/memoryMiB
+  value: 16384
+- op: replace
+  path: /spec/template/spec/disks/bootVolume/sizeGb
+  value: 100

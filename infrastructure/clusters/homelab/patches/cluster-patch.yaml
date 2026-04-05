@@ -1,20 +1,17 @@
-apiVersion: cluster.x-k8s.io/v1beta1
-kind: Cluster
-metadata:
-  name: homelab
-spec:
-  clusterNetwork:
-    pods:
-      cidrBlocks:
-        - "10.245.0.0/16"
-    services:
-      cidrBlocks:
-        - "10.97.0.0/16"
-  infrastructureRef:
-    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
-    kind: ProxmoxCluster
-    name: homelab
-  controlPlaneRef:
-    apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
-    kind: TalosControlPlane
-    name: homelab-cp
+- op: replace
+  path: /metadata/name
+  value: homelab
+- op: replace
+  path: /spec/clusterNetwork/pods/cidrBlocks
+  value:
+    - "10.245.0.0/16"
+- op: replace
+  path: /spec/clusterNetwork/services/cidrBlocks
+  value:
+    - "10.97.0.0/16"
+- op: replace
+  path: /spec/infrastructureRef/name
+  value: homelab
+- op: replace
+  path: /spec/controlPlaneRef/name
+  value: homelab-cp
