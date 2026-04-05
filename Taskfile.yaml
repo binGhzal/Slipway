@@ -1,11 +1,18 @@
 version: '3'
 
-dotenv: ['.env']
+dotenv: ['.env.slipway']
 
 vars:
   CLUSTER_NAME: slipway-mgmt
   CLUSTER_NAMESPACE: slipway-mgmt
   KUBECONFIG_MGMT: "{{.HOME}}/.kube/slipway-mgmt"
+  TALOS_VERSION: v1.9.5
+  TALOS_TEMPLATE_VMID: 9000
+  TALOS_SCHEMATIC_ID: ""
+  # Talos Image Factory schematic with extensions:
+  # qemu-guest-agent, iscsi-tools
+  # Generate your own at https://factory.talos.dev/
+  TALOS_FACTORY_URL: "https://factory.talos.dev/image/{{.TALOS_SCHEMATIC_ID}}/{{.TALOS_VERSION}}/nocloud-amd64.raw.xz"
 
 tasks:
   deps:
@@ -19,6 +26,133 @@ tasks:
       - command -v cilium >/dev/null 2>&1 || { echo "cilium cli not found"; exit 1; }
       - echo "All dependencies found"
 
+  # ── Talos Template ──────────────────────────────────────────
+  talos:template:
+    desc: |
+      Create a Talos VM template on Proxmox.
+      Run this on your Proxmox node via SSH, or use the generated script.
+      Requires: wget, qm commands on Proxmox host.
+    cmds:
+      - |
+        echo "═══════════════════════════════════════════════════════════"
+        echo "  Talos VM Template Builder for Proxmox"
+        echo "═══════════════════════════════════════════════════════════"
+        echo ""
+        echo "Run these commands on your Proxmox node (via SSH):"
+        echo ""
+        echo "# 1. Download Talos nocloud image"
+        echo "wget -O /tmp/talos-nocloud.raw.xz {{.TALOS_FACTORY_URL}}"
+        echo "xz -d /tmp/talos-nocloud.raw.xz"
+        echo ""
+        echo "# 2. Create VM (VMID {{.TALOS_TEMPLATE_VMID}})"
+        echo "qm create {{.TALOS_TEMPLATE_VMID}} \\"
+        echo "  --name talos-{{.TALOS_VERSION}} \\"
+        echo "  --memory 8192 \\"
+        echo "  --cores 2 \\"
+        echo "  --sockets 2 \\"
+        echo "  --net0 virtio,bridge=vmbr0,tag=2 \\"
+        echo "  --bios ovmf \\"
+        echo "  --machine q35 \\"
+        echo "  --scsihw virtio-scsi-single \\"
+        echo "  --agent enabled=1 \\"
+        echo "  --ostype l26"
+        echo ""
+        echo "# 3. Import disk to VM"
+        echo "qm importdisk {{.TALOS_TEMPLATE_VMID}} /tmp/talos-nocloud.raw bigdisk"
+        echo ""
+        echo "# 4. Attach the disk and configure boot"
+        echo "qm set {{.TALOS_TEMPLATE_VMID}} \\"
+        echo "  --scsi0 bigdisk:vm-{{.TALOS_TEMPLATE_VMID}}-disk-0,discard=on,iothread=1,ssd=1 \\"
+        echo "  --boot order=scsi0 \\"
+        echo "  --ide2 none"
+        echo ""
+        echo "# 5. Add EFI disk (required for UEFI/secureboot)"
+        echo "qm set {{.TALOS_TEMPLATE_VMID}} --efidisk0 local-lvm:0,efitype=4m,pre-enrolled-keys=0"
+        echo ""
+        echo "# 6. Convert to template"
+        echo "qm template {{.TALOS_TEMPLATE_VMID}}"
+        echo ""
+        echo "# 7. Clean up"
+        echo "rm -f /tmp/talos-nocloud.raw"
+        echo ""
+        echo "═══════════════════════════════════════════════════════════"
+        echo "After running these commands, re-run: task mgmt:apply"
+        echo "═══════════════════════════════════════════════════════════"
+
+  talos:template:script:
+    desc: Generate a script to create the Talos template on Proxmox
+    cmds:
+      - |
+        cat > bootstrap/create-talos-template.sh << 'SCRIPT'
+        #!/bin/bash
+        set -euo pipefail
+
+        TALOS_VERSION="${TALOS_VERSION:-v1.9.5}"
+        VMID="${VMID:-9000}"
+        STORAGE="${STORAGE:-bigdisk}"
+        BRIDGE="${BRIDGE:-vmbr0}"
+        VLAN="${VLAN:-2}"
+        SCHEMATIC_ID="${SCHEMATIC_ID:-}"
+
+        # Build the image URL
+        if [ -n "$SCHEMATIC_ID" ]; then
+          IMAGE_URL="https://factory.talos.dev/image/${SCHEMATIC_ID}/${TALOS_VERSION}/nocloud-amd64.raw.xz"
+        else
+          IMAGE_URL="https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/${TALOS_VERSION}/nocloud-amd64.raw.xz"
+          echo "Using default schematic (qemu-guest-agent + iscsi-tools)"
+        fi
+
+        echo "==> Downloading Talos ${TALOS_VERSION} nocloud image..."
+        wget -q --show-progress -O /tmp/talos-nocloud.raw.xz "${IMAGE_URL}"
+        echo "==> Decompressing..."
+        xz -d /tmp/talos-nocloud.raw.xz
+
+        echo "==> Destroying existing VM ${VMID} if present..."
+        qm destroy ${VMID} --purge 2>/dev/null || true
+
+        echo "==> Creating VM ${VMID}..."
+        qm create ${VMID} \
+          --name "talos-${TALOS_VERSION}" \
+          --memory 8192 \
+          --cores 2 \
+          --sockets 2 \
+          --net0 "virtio,bridge=${BRIDGE},tag=${VLAN}" \
+          --bios ovmf \
+          --machine q35 \
+          --scsihw virtio-scsi-single \
+          --agent enabled=1 \
+          --ostype l26
+
+        echo "==> Importing disk to ${STORAGE}..."
+        qm importdisk ${VMID} /tmp/talos-nocloud.raw ${STORAGE}
+
+        echo "==> Configuring VM..."
+        qm set ${VMID} \
+          --scsi0 "${STORAGE}:vm-${VMID}-disk-0,discard=on,iothread=1,ssd=1" \
+          --boot order=scsi0
+
+        echo "==> Adding EFI disk..."
+        qm set ${VMID} --efidisk0 "local-lvm:0,efitype=4m,pre-enrolled-keys=0"
+
+        echo "==> Converting to template..."
+        qm template ${VMID}
+
+        echo "==> Cleaning up..."
+        rm -f /tmp/talos-nocloud.raw
+
+        echo "==> Done! Template VMID ${VMID} is ready."
+        echo "    Name: talos-${TALOS_VERSION}"
+        echo "    Storage: ${STORAGE}"
+        echo "    Network: ${BRIDGE} (VLAN ${VLAN})"
+        SCRIPT
+        chmod +x bootstrap/create-talos-template.sh
+        echo "Script generated: bootstrap/create-talos-template.sh"
+        echo ""
+        echo "Copy to your Proxmox node and run:"
+        echo "  scp bootstrap/create-talos-template.sh root@10.0.0.139:/tmp/"
+        echo "  ssh root@10.0.0.139 'VMID=9000 STORAGE=bigdisk bash /tmp/create-talos-template.sh'"
+
+  # ── Bootstrap ────────────────────────────────────────────────
   bootstrap:up:
     desc: Create Kind bootstrap cluster
     cmds:
@@ -39,13 +173,14 @@ tasks:
       - kubectl apply -f platform/capi-operator/providers/
       - echo "Waiting for CAPI providers to install..."
       - sleep 60
-      - kubectl get coreproviders,infrastructureproviders,bootstrapproviders,controlplaneproviders -A
+      - kubectl get coreproviders,infrastructureproviders,bootstrapproviders,controlplaneproviders,ipamproviders -A
 
   bootstrap:down:
     desc: Delete Kind bootstrap cluster
     cmds:
       - kind delete cluster --name slipway-bootstrap
 
+  # ── Management Cluster ──────────────────────────────────────
   mgmt:secret:
     desc: Create Proxmox API credentials secret
     cmds:
@@ -90,30 +225,40 @@ tasks:
     desc: Install ArgoCD on management cluster
     cmds:
       - helm repo add argo https://argoproj.github.io/argo-helm
+      - helm repo update argo
       - |
         helm install argocd argo/argo-cd \
           --kubeconfig {{.KUBECONFIG_MGMT}} \
           --namespace argocd --create-namespace \
           --values platform/argocd/values.yaml --wait --timeout 5m
 
+  # ── Pivot ────────────────────────────────────────────────────
   pivot:
     desc: Pivot CAPI from Kind to management cluster
     cmds:
+      - |
+        helm install cert-manager jetstack/cert-manager \
+          --kubeconfig {{.KUBECONFIG_MGMT}} \
+          --namespace cert-manager --create-namespace \
+          --set crds.enabled=true --wait --timeout 5m
       - |
         helm install capi-operator capi-operator/cluster-api-operator \
           --kubeconfig {{.KUBECONFIG_MGMT}} \
           --namespace capi-system --create-namespace --wait --timeout 5m
       - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f platform/capi-operator/providers/
-      - sleep 30
+      - echo "Waiting for providers to install on mgmt cluster..."
+      - sleep 60
       - clusterctl move --to-kubeconfig {{.KUBECONFIG_MGMT}}
       - echo "Pivot complete. You can now run 'task bootstrap:down'"
 
+  # ── GitOps ───────────────────────────────────────────────────
   gitops:bootstrap:
     desc: Apply ArgoCD root app to begin self-management
     cmds:
       - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f gitops/root-app.yaml
       - echo "Root app applied. ArgoCD will now manage everything from Git."
 
+  # ── Full Sequence ────────────────────────────────────────────
   full-bootstrap:
     desc: Full bootstrap sequence (Kind -> mgmt cluster -> pivot -> GitOps)
     cmds:

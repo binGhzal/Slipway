@@ -7,13 +7,13 @@
 - op: replace
   path: /spec/infrastructureTemplate/name
   value: slipway-mgmt-cp
+# Add VIP to control plane config
 - op: add
-  path: /spec/controlPlaneConfig/controlplane/configPatches/-
+  path: /spec/controlPlaneConfig/controlplane/strategicPatches/0/machine/network/interfaces/0/vip
   value:
-    op: add
-    path: /machine/network
-    value:
-      interfaces:
-        - interface: eth0
-          vip:
-            ip: 10.10.0.10
+    ip: 10.10.0.10
+# Add VIP to init config
+- op: add
+  path: /spec/controlPlaneConfig/init/strategicPatches/0/machine/network/interfaces/0/vip
+  value:
+    ip: 10.10.0.10

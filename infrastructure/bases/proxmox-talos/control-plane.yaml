@@ -12,12 +12,40 @@ spec:
   controlPlaneConfig:
     controlplane:
       generateType: controlplane
-      configPatches:
-        - op: replace
-          path: /cluster/network/cni
-          value:
-            name: none
-        - op: replace
-          path: /cluster/proxy
-          value:
-            disabled: true
+      talosVersion: v1.9
+      strategicPatches:
+        # Disable default CNI — Cilium will be installed
+        - machine:
+            install:
+              disk: /dev/sda
+              extraKernelArgs:
+                - net.ifnames=0
+            network:
+              interfaces:
+                - interface: eth0
+                  dhcp: true
+          cluster:
+            network:
+              cni:
+                name: none
+            proxy:
+              disabled: true
+    init:
+      generateType: init
+      talosVersion: v1.9
+      strategicPatches:
+        - machine:
+            install:
+              disk: /dev/sda
+              extraKernelArgs:
+                - net.ifnames=0
+            network:
+              interfaces:
+                - interface: eth0
+                  dhcp: true
+          cluster:
+            network:
+              cni:
+                name: none
+            proxy:
+              disabled: true

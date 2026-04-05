@@ -36,15 +36,22 @@ spec:
     spec:
       generateType: worker
       talosVersion: v1.9
-      configPatches:
-        - op: replace
-          path: /cluster/network/cni
-          value:
-            name: none
-        - op: replace
-          path: /cluster/proxy
-          value:
-            disabled: true
+      strategicPatches:
+        - machine:
+            install:
+              disk: /dev/sda
+              extraKernelArgs:
+                - net.ifnames=0
+            network:
+              interfaces:
+                - interface: eth0
+                  dhcp: true
+          cluster:
+            network:
+              cni:
+                name: none
+            proxy:
+              disabled: true
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: ProxmoxMachineTemplate
@@ -69,3 +76,7 @@ spec:
           bridge: vmbr0
           model: virtio
           vlan: 2
+      checks:
+        skipCloudInitStatus: true
+      metadataSettings:
+        providerIDInjection: true

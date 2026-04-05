@@ -30,6 +30,7 @@ secrets/
 
 # Additional env patterns
 *.env
+*.env.slipway
 
 # Kubeconfig
 admin.conf

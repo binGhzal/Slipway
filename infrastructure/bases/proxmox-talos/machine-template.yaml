@@ -20,3 +20,7 @@ spec:
           bridge: vmbr0
           model: virtio
           vlan: 2
+      checks:
+        skipCloudInitStatus: true
+      metadataSettings:
+        providerIDInjection: true

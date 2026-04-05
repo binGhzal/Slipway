@@ -1,24 +1,19 @@
-apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
-kind: TalosControlPlane
-metadata:
-  name: homelab-cp
-spec:
-  replicas: 3
-  controlPlaneConfig:
-    controlplane:
-      configPatches:
-        - op: replace
-          path: /cluster/network/cni
-          value:
-            name: none
-        - op: replace
-          path: /cluster/proxy
-          value:
-            disabled: true
-        - op: add
-          path: /machine/network
-          value:
-            interfaces:
-              - interface: eth0
-                vip:
-                  ip: 10.10.0.20
+- op: replace
+  path: /metadata/name
+  value: homelab-cp
+- op: replace
+  path: /spec/replicas
+  value: 3
+- op: replace
+  path: /spec/infrastructureTemplate/name
+  value: homelab-cp
+# Add VIP to control plane config
+- op: add
+  path: /spec/controlPlaneConfig/controlplane/strategicPatches/0/machine/network/interfaces/0/vip
+  value:
+    ip: 10.10.0.20
+# Add VIP to init config
+- op: add
+  path: /spec/controlPlaneConfig/init/strategicPatches/0/machine/network/interfaces/0/vip
+  value:
+    ip: 10.10.0.20
