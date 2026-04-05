@@ -1,0 +1,7 @@
+apiVersion: v2
+name: capi2argo
+version: 0.1.0
+dependencies:
+  - name: capi2argo-cluster-operator
+    version: "0.4.1"
+    repository: https://dntosas.github.io/capi2argo-cluster-operator/

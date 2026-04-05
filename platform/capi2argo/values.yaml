@@ -1,0 +1,6 @@
+capi2argo-cluster-operator:
+  # Watches CAPI cluster secrets and creates ArgoCD cluster secrets
+  env:
+    ARGOCD_NAMESPACE: argocd
+    ENABLE_GARBAGE_COLLECTION: "true"
+    ENABLE_AUTO_LABEL_COPY: "true"

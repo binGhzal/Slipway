@@ -1,5 +1,8 @@
 cilium:
   kubeProxyReplacement: true
+  # Talos KubePrism endpoint (mandatory for Talos)
+  k8sServiceHost: localhost
+  k8sServicePort: 7445
   ipam:
     mode: kubernetes
   gatewayAPI:
@@ -20,3 +23,27 @@ cilium:
     masquerade: true
   operator:
     replicas: 1
+  # Talos-specific: cgroup settings
+  cgroup:
+    autoMount:
+      enabled: false
+    hostRoot: /sys/fs/cgroup
+  # Talos-specific: remove SYS_MODULE capability
+  securityContext:
+    capabilities:
+      ciliumAgent:
+        - CHOWN
+        - KILL
+        - NET_ADMIN
+        - NET_RAW
+        - IPC_LOCK
+        - SYS_ADMIN
+        - SYS_RESOURCE
+        - DAC_OVERRIDE
+        - FOWNER
+        - SETGID
+        - SETUID
+      cleanCiliumState:
+        - NET_ADMIN
+        - SYS_ADMIN
+        - SYS_RESOURCE

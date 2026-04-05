@@ -236,20 +236,24 @@ tasks:
   pivot:
     desc: Pivot CAPI from Kind to management cluster
     cmds:
+      # cert-manager is required by CAPI webhooks
       - |
         helm install cert-manager jetstack/cert-manager \
           --kubeconfig {{.KUBECONFIG_MGMT}} \
           --namespace cert-manager --create-namespace \
           --set crds.enabled=true --wait --timeout 5m
+      # Install CAPI providers via clusterctl (NOT CAPI Operator — clusterctl move requires this)
       - |
-        helm install capi-operator capi-operator/cluster-api-operator \
+        clusterctl init \
           --kubeconfig {{.KUBECONFIG_MGMT}} \
-          --namespace capi-system --create-namespace --wait --timeout 5m
-      - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f platform/capi-operator/providers/
-      - echo "Waiting for providers to install on mgmt cluster..."
+          --infrastructure proxmox \
+          --control-plane talos \
+          --bootstrap talos
+      - echo "Waiting for providers to be ready on mgmt cluster..."
       - sleep 60
+      # Move all CAPI resources from Kind to mgmt
       - clusterctl move --to-kubeconfig {{.KUBECONFIG_MGMT}}
-      - echo "Pivot complete. You can now run 'task bootstrap:down'"
+      - echo "Pivot complete. Run 'task bootstrap:down' to delete Kind."
 
   # ── GitOps ───────────────────────────────────────────────────
   gitops:bootstrap:
