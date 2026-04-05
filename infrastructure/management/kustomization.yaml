@@ -4,32 +4,83 @@ resources:
   - namespace.yaml
   - ../bases/proxmox-talos
 patches:
+  # Rename all resources to slipway-mgmt-*
   - target:
       kind: Cluster
       name: cluster-name
-    path: patches/cluster-patch.yaml
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt
   - target:
       kind: ProxmoxCluster
       name: cluster-name
-    path: patches/proxmox-cluster-patch.yaml
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt
   - target:
       kind: TalosControlPlane
       name: cluster-name-cp
-    path: patches/control-plane-patch.yaml
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt-cp
   - target:
       kind: ProxmoxMachineTemplate
       name: cluster-name-cp
-    path: patches/machine-template-patch.yaml
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt-cp
   - target:
       kind: TalosConfigTemplate
       name: cluster-name-workers
-    path: patches/worker-config-patch.yaml
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt-workers
   - target:
       kind: ProxmoxMachineTemplate
       name: cluster-name-workers
-    path: patches/worker-machine-template-patch.yaml
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt-workers
   - target:
       kind: MachineDeployment
       name: cluster-name-workers
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: slipway-mgmt-workers
+  # Apply spec patches
+  - target:
+      kind: Cluster
+      name: slipway-mgmt
+    path: patches/cluster-patch.yaml
+  - target:
+      kind: ProxmoxCluster
+      name: slipway-mgmt
+    path: patches/proxmox-cluster-patch.yaml
+  - target:
+      kind: TalosControlPlane
+      name: slipway-mgmt-cp
+    path: patches/control-plane-patch.yaml
+  - target:
+      kind: ProxmoxMachineTemplate
+      name: slipway-mgmt-cp
+    path: patches/machine-template-patch.yaml
+  - target:
+      kind: TalosConfigTemplate
+      name: slipway-mgmt-workers
+    path: patches/worker-config-patch.yaml
+  - target:
+      kind: ProxmoxMachineTemplate
+      name: slipway-mgmt-workers
+    path: patches/worker-machine-template-patch.yaml
+  - target:
+      kind: MachineDeployment
+      name: slipway-mgmt-workers
     path: patches/machine-deployment-patch.yaml
 namespace: slipway-mgmt

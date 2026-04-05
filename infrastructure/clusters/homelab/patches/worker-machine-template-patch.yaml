@@ -7,6 +7,7 @@ spec:
     spec:
       sourceNode: pve
       templateID: 9000
+      full: true
       numSockets: 2
       numCores: 4
       memoryMiB: 16384
@@ -19,4 +20,5 @@ spec:
           bridge: vmbr0
           model: virtio
           vlan: 2
-      skipCloudInitStatus: true
+      checks:
+        skipCloudInitStatus: true
