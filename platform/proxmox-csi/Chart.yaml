@@ -1,0 +1,4 @@
+apiVersion: v2
+name: proxmox-csi
+version: 0.1.0
+description: Proxmox CSI plugin (placeholder - no official Helm chart)

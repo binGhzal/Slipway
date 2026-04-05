@@ -1,0 +1,7 @@
+apiVersion: v2
+name: capi-operator
+version: 0.1.0
+dependencies:
+  - name: cluster-api-operator
+    version: "0.15.1"
+    repository: https://kubernetes-sigs.github.io/cluster-api-operator

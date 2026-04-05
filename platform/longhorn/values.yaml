@@ -1,0 +1,6 @@
+longhorn:
+  defaultSettings:
+    defaultDataPath: /var/lib/longhorn
+    defaultReplicaCount: 2
+    storageOverProvisioningPercentage: 100
+    storageMinimalAvailablePercentage: 15

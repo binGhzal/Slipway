@@ -27,3 +27,20 @@ secrets/
 
 # Flux
 .flux.yaml
+
+# Additional env patterns
+*.env
+
+# Kubeconfig
+admin.conf
+
+# Helm charts
+**/charts/
+
+# SOPS
+*.dec
+*.cleartext
+
+# Talos
+talosconfig
+*.talosconfig

@@ -1,0 +1,30 @@
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+kind: TalosControlPlane
+metadata:
+  name: cluster-name-cp
+spec:
+  replicas: 1
+  version: v1.32.0
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+    kind: ProxmoxMachineTemplate
+    name: cluster-name-cp
+  controlPlaneConfig:
+    controlplane:
+      generateType: controlplane
+      configPatches:
+        - op: replace
+          path: /cluster/network/cni
+          value:
+            name: none
+        - op: replace
+          path: /cluster/proxy
+          value:
+            disabled: true
+        - op: add
+          path: /machine/network
+          value:
+            interfaces:
+              - interface: eth0
+                vip:
+                  ip: 0.0.0.0

@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-core
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            slipway.io/platform: "true"
+  template:
+    metadata:
+      name: '{{name}}-platform-core'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/binGhzal/Slipway.git
+          targetRevision: main
+          path: platform/cilium-config
+        - repoURL: https://github.com/binGhzal/Slipway.git
+          targetRevision: main
+          path: platform/reloader
+          helm:
+            valueFiles:
+              - values.yaml
+      destination:
+        server: '{{server}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

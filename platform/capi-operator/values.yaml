@@ -1,0 +1,5 @@
+cluster-api-operator:
+  manager:
+    featureGates:
+      ClusterTopology: true
+      ClusterResourceSet: true
