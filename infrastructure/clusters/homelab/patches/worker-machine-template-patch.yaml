@@ -7,6 +7,7 @@ spec:
     spec:
       sourceNode: pve
       templateID: 9000
+      format: qcow2
       full: true
       numSockets: 1
       numCores: 4
@@ -22,6 +23,3 @@ spec:
           vlan: 2
       checks:
         skipCloudInitStatus: true
-        skipQemuGuestAgent: true
-      metadataSettings:
-        providerIDInjection: true
