@@ -8,7 +8,7 @@ spec:
       sourceNode: pve
       templateID: 9000
       full: true
-      numSockets: 2
+      numSockets: 1
       numCores: 2
       memoryMiB: 8192
       disks:
@@ -21,3 +21,6 @@ spec:
           model: virtio
       checks:
         skipCloudInitStatus: true
+        skipQemuGuestAgent: true
+      metadataSettings:
+        providerIDInjection: true

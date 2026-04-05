@@ -8,7 +8,7 @@ spec:
       sourceNode: pve
       templateID: 9000
       full: true
-      numSockets: 2
+      numSockets: 1
       numCores: 4
       memoryMiB: 16384
       disks:
@@ -22,3 +22,6 @@ spec:
           vlan: 2
       checks:
         skipCloudInitStatus: true
+        skipQemuGuestAgent: true
+      metadataSettings:
+        providerIDInjection: true
