@@ -4,10 +4,13 @@ metadata:
   name: homelab
 spec:
   controlPlaneEndpoint:
-    host: 10.10.0.20
+    host: "10.10.0.20"
     port: 6443
+  credentialsRef:
+    name: proxmox-credentials
   ipv4Config:
     addresses:
       - 10.10.0.21-10.10.0.39
     prefix: 20
     gateway: 10.10.0.1
+    metric: 100

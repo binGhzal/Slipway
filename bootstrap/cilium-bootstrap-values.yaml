@@ -5,3 +5,5 @@ ipam:
   mode: kubernetes
 image:
   pullPolicy: IfNotPresent
+operator:
+  replicas: 1

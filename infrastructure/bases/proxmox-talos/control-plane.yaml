@@ -21,10 +21,3 @@ spec:
           path: /cluster/proxy
           value:
             disabled: true
-        - op: add
-          path: /machine/network
-          value:
-            interfaces:
-              - interface: eth0
-                vip:
-                  ip: 0.0.0.0

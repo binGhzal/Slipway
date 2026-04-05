@@ -3,9 +3,21 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - ../bases/proxmox-talos
-patches:
-  - path: patches/cluster-patch.yaml
-  - path: patches/proxmox-cluster-patch.yaml
-  - path: patches/control-plane-patch.yaml
-  - path: patches/machine-template-patch.yaml
 namespace: slipway-mgmt
+patches:
+  - target:
+      kind: Cluster
+      name: cluster-name
+    path: patches/cluster-patch.yaml
+  - target:
+      kind: ProxmoxCluster
+      name: cluster-name
+    path: patches/proxmox-cluster-patch.yaml
+  - target:
+      kind: TalosControlPlane
+      name: cluster-name-cp
+    path: patches/control-plane-patch.yaml
+  - target:
+      kind: ProxmoxMachineTemplate
+      name: cluster-name-cp
+    path: patches/machine-template-patch.yaml

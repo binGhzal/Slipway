@@ -1,18 +1,19 @@
-apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
-kind: TalosControlPlane
-metadata:
-  name: slipway-mgmt-cp
-spec:
-  replicas: 1
-  infrastructureTemplate:
-    name: slipway-mgmt-cp
-  controlPlaneConfig:
-    controlplane:
-      configPatches:
-        - op: add
-          path: /machine/network
-          value:
-            interfaces:
-              - interface: eth0
-                vip:
-                  ip: 10.10.0.10
+- op: replace
+  path: /metadata/name
+  value: slipway-mgmt-cp
+- op: replace
+  path: /spec/replicas
+  value: 1
+- op: replace
+  path: /spec/infrastructureTemplate/name
+  value: slipway-mgmt-cp
+- op: add
+  path: /spec/controlPlaneConfig/controlplane/configPatches/-
+  value:
+    op: add
+    path: /machine/network
+    value:
+      interfaces:
+        - interface: eth0
+          vip:
+            ip: 10.10.0.10

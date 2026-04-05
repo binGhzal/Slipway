@@ -56,17 +56,16 @@ spec:
     spec:
       sourceNode: pve
       templateID: 9000
-      format: qcow2
       full: true
       numSockets: 2
       numCores: 2
       memoryMiB: 8192
       disks:
-        - bootOrder: 1
-          bus: scsi
+        bootVolume:
+          disk: scsi0
           sizeGb: 100
       network:
         default:
           bridge: vmbr0
           model: virtio
-          tag: 2
+          vlan: 2

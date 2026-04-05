@@ -6,11 +6,14 @@ spec:
   controlPlaneEndpoint:
     host: 0.0.0.0
     port: 6443
+  credentialsRef:
+    name: proxmox-credentials
   ipv4Config:
     addresses:
       - 10.10.0.11-10.10.0.19
     prefix: 20
     gateway: 10.10.0.1
+    metric: 100
   dnsServers:
     - 1.1.1.1
     - 8.8.8.8

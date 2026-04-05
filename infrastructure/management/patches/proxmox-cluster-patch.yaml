@@ -1,13 +1,12 @@
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
-kind: ProxmoxCluster
-metadata:
-  name: slipway-mgmt
-spec:
-  controlPlaneEndpoint:
+- op: replace
+  path: /metadata/name
+  value: slipway-mgmt
+- op: replace
+  path: /spec/controlPlaneEndpoint
+  value:
     host: "10.10.0.10"
     port: 6443
-  ipv4Config:
-    addresses:
-      - 10.10.0.11-10.10.0.19
-    prefix: 20
-    gateway: 10.10.0.1
+- op: replace
+  path: /spec/ipv4Config/addresses
+  value:
+    - "10.10.0.11-10.10.0.19"

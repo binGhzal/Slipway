@@ -1,5 +1,7 @@
 version: '3'
 
+dotenv: ['.env']
+
 vars:
   CLUSTER_NAME: slipway-mgmt
   CLUSTER_NAMESPACE: slipway-mgmt
@@ -23,15 +25,21 @@ tasks:
       - kind create cluster --config bootstrap/kind-config.yaml
       - kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
       - helm repo add cilium https://helm.cilium.io/
+      - helm repo update cilium
       - helm install cilium cilium/cilium --namespace kube-system --values bootstrap/cilium-bootstrap-values.yaml --wait
 
   bootstrap:capi:
     desc: Install CAPI Operator and providers on bootstrap cluster
-    deps: [bootstrap:up]
     cmds:
+      - helm repo add jetstack https://charts.jetstack.io
       - helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
+      - helm repo update jetstack capi-operator
+      - helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true --wait --timeout 5m
       - helm install capi-operator capi-operator/cluster-api-operator --namespace capi-system --create-namespace --wait --timeout 5m
       - kubectl apply -f platform/capi-operator/providers/
+      - echo "Waiting for CAPI providers to install..."
+      - sleep 60
+      - kubectl get coreproviders,infrastructureproviders,bootstrapproviders,controlplaneproviders -A
 
   bootstrap:down:
     desc: Delete Kind bootstrap cluster
@@ -45,9 +53,9 @@ tasks:
         kubectl create namespace {{.CLUSTER_NAMESPACE}} --dry-run=client -o yaml | kubectl apply -f -
         kubectl create secret generic proxmox-credentials \
           --namespace {{.CLUSTER_NAMESPACE}} \
-          --from-literal=PROXMOX_URL=${PROXMOX_URL} \
-          --from-literal=PROXMOX_TOKEN=${PROXMOX_TOKEN} \
-          --from-literal=PROXMOX_SECRET=${PROXMOX_SECRET} \
+          --from-literal=url=${PROXMOX_URL} \
+          --from-literal=token=${PROXMOX_TOKEN} \
+          --from-literal=secret=${PROXMOX_SECRET} \
           --dry-run=client -o yaml | kubectl apply -f -
 
   mgmt:apply:
