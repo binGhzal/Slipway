@@ -16,3 +16,5 @@ spec:
     - 8.8.8.8
   allowedNodes:
     - pve
+  schedulerHints:
+    memoryAdjustment: 0

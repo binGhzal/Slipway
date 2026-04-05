@@ -3,7 +3,9 @@ kind: TalosControlPlane
 metadata:
   name: homelab-cp
 spec:
-  replicas: 3
+  replicas: 1
+  infrastructureTemplate:
+    name: homelab-cp
   controlPlaneConfig:
     controlplane:
       configPatches:
@@ -15,6 +17,14 @@ spec:
           path: /cluster/proxy
           value:
             disabled: true
+        - op: add
+          path: /machine/install/disk
+          value: /dev/sda
+        - op: add
+          path: /machine/kubelet/extraArgs
+          value:
+            cloud-provider: external
+            rotate-server-certificates: "true"
         - op: add
           path: /machine/network
           value:

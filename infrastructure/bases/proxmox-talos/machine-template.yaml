@@ -11,10 +11,11 @@ spec:
       numCores: 2
       memoryMiB: 8192
       disks:
-        - bootOrder: 1
-          bus: scsi
+        bootVolume:
+          disk: scsi0
           sizeGb: 50
       network:
-        - bridge: vmbr0
+        default:
+          bridge: vmbr0
           model: virtio
-          tag: 2
+      skipCloudInitStatus: true

@@ -1,0 +1,13 @@
+spegel:
+  spegel:
+    containerdRegistryConfigPath: /etc/cri/conf.d/hosts
+    # Talos requires this containerd patch for Spegel:
+    # Add to TalosControlPlane/TalosConfigTemplate configPatches:
+    #   - op: add
+    #     path: /machine/files
+    #     value:
+    #       - content: |
+    #           [plugins."io.containerd.cri.v1.images"]
+    #             discard_unpacked_layers = false
+    #         path: /etc/cri/conf.d/20-customization.part
+    #         op: create

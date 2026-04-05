@@ -1,0 +1,7 @@
+apiVersion: v2
+name: headlamp
+version: 0.1.0
+dependencies:
+  - name: headlamp
+    version: 0.25.0
+    repository: https://headlamp-k8s.github.io/headlamp/

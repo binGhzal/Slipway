@@ -15,10 +15,11 @@ kubeconfig.yaml
 *.kubeconfig
 admin.conf
 
-# Secrets
+# Secrets (actual secret values only)
 .env
 *.secret.yaml
-secrets/
+# Note: platform/external-secrets/secrets/ contains ExternalSecret CRDs
+# (references to secrets, not actual values) - those are tracked in Git
 
 # Terraform (if used later)
 .terraform/
@@ -28,8 +29,8 @@ secrets/
 # Flux
 .flux.yaml
 
-# Additional env patterns
-*.env
+# Additional env patterns (but not .env.example)
+!.env.example
 
 # Kubeconfig
 admin.conf
@@ -37,9 +38,9 @@ admin.conf
 # Helm charts
 **/charts/
 
-# SOPS
-*.dec
-*.cleartext
+# Talos images
+*.raw
+*.raw.xz
 
 # Talos
 talosconfig

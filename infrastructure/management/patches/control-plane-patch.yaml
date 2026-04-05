@@ -9,6 +9,22 @@ spec:
   controlPlaneConfig:
     controlplane:
       configPatches:
+        - op: replace
+          path: /cluster/network/cni
+          value:
+            name: none
+        - op: replace
+          path: /cluster/proxy
+          value:
+            disabled: true
+        - op: add
+          path: /machine/install/disk
+          value: /dev/sda
+        - op: add
+          path: /machine/kubelet/extraArgs
+          value:
+            cloud-provider: external
+            rotate-server-certificates: "true"
         - op: add
           path: /machine/network
           value:

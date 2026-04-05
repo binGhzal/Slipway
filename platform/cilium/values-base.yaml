@@ -20,3 +20,13 @@ cilium:
     masquerade: true
   operator:
     replicas: 1
+  bandwidthManager:
+    enabled: true
+    bbr: true
+  hostFirewall:
+    enabled: true
+  socketLB:
+    enabled: true
+  localRedirectPolicy: true
+  envoy:
+    enabled: true

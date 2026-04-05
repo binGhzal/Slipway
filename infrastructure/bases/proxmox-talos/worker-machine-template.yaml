@@ -1,7 +1,7 @@
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: ProxmoxMachineTemplate
 metadata:
-  name: slipway-mgmt-cp
+  name: cluster-name-workers
 spec:
   template:
     spec:
@@ -13,10 +13,9 @@ spec:
       disks:
         bootVolume:
           disk: scsi0
-          sizeGb: 50
+          sizeGb: 100
       network:
         default:
           bridge: vmbr0
           model: virtio
-          vlan: 2
       skipCloudInitStatus: true

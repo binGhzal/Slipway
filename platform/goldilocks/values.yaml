@@ -1,0 +1,20 @@
+goldilocks:
+  dashboard:
+    enabled: true
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+
+vpa:
+  recommender:
+    enabled: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  updater:
+    enabled: false  # Recommendation mode only - no auto-scaling
+  admissionController:
+    enabled: false

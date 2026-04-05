@@ -3,10 +3,33 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - ../../bases/proxmox-talos
-  - workers.yaml
 patches:
-  - path: patches/cluster-patch.yaml
-  - path: patches/proxmox-cluster-patch.yaml
-  - path: patches/control-plane-patch.yaml
-  - path: patches/machine-template-patch.yaml
+  - target:
+      kind: Cluster
+      name: cluster-name
+    path: patches/cluster-patch.yaml
+  - target:
+      kind: ProxmoxCluster
+      name: cluster-name
+    path: patches/proxmox-cluster-patch.yaml
+  - target:
+      kind: TalosControlPlane
+      name: cluster-name-cp
+    path: patches/control-plane-patch.yaml
+  - target:
+      kind: ProxmoxMachineTemplate
+      name: cluster-name-cp
+    path: patches/machine-template-patch.yaml
+  - target:
+      kind: TalosConfigTemplate
+      name: cluster-name-workers
+    path: patches/worker-config-patch.yaml
+  - target:
+      kind: ProxmoxMachineTemplate
+      name: cluster-name-workers
+    path: patches/worker-machine-template-patch.yaml
+  - target:
+      kind: MachineDeployment
+      name: cluster-name-workers
+    path: patches/machine-deployment-patch.yaml
 namespace: homelab

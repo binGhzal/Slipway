@@ -4,6 +4,6 @@ metadata:
   name: talos
   namespace: capi-system
 spec:
-  version: v0.6.7
+  version: v0.6.11
   fetchConfig:
-    url: https://github.com/siderolabs/cluster-api-bootstrap-provider-talos/releases/v0.6.7/bootstrap-components.yaml
+    url: https://github.com/siderolabs/cluster-api-bootstrap-provider-talos/releases/v0.6.11/bootstrap-components.yaml

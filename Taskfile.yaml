@@ -1,24 +1,44 @@
 version: '3'
 
+dotenv: ['.env']
+
 vars:
   CLUSTER_NAME: slipway-mgmt
   CLUSTER_NAMESPACE: slipway-mgmt
   KUBECONFIG_MGMT: "{{.HOME}}/.kube/slipway-mgmt"
 
 tasks:
+  # ============================================================
+  # Setup
+  # ============================================================
+  init:
+    desc: Initialize the project - copy .env.example and validate
+    cmds:
+      - |
+        if [ ! -f .env ]; then
+          cp .env.example .env
+          echo "Created .env from template. Please fill in your values."
+          exit 1
+        fi
+      - task: deps
+      - echo "Environment validated. Ready to bootstrap."
+
   deps:
     desc: Check required tools
     cmds:
-      - command -v kind >/dev/null 2>&1 || { echo "kind not found"; exit 1; }
+      - command -v kind >/dev/null 2>&1 || { echo "kind not found - https://kind.sigs.k8s.io/docs/user/quick-start/#installation"; exit 1; }
       - command -v kubectl >/dev/null 2>&1 || { echo "kubectl not found"; exit 1; }
-      - command -v clusterctl >/dev/null 2>&1 || { echo "clusterctl not found"; exit 1; }
-      - command -v talosctl >/dev/null 2>&1 || { echo "talosctl not found"; exit 1; }
+      - command -v clusterctl >/dev/null 2>&1 || { echo "clusterctl not found - https://cluster-api.sigs.k8s.io/user/quick-start#install-clusterctl"; exit 1; }
+      - command -v talosctl >/dev/null 2>&1 || { echo "talosctl not found - https://www.talos.dev/latest/introduction/getting-started/#talosctl"; exit 1; }
       - command -v helm >/dev/null 2>&1 || { echo "helm not found"; exit 1; }
-      - command -v cilium >/dev/null 2>&1 || { echo "cilium cli not found"; exit 1; }
+      - command -v cilium >/dev/null 2>&1 || { echo "cilium cli not found - https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli"; exit 1; }
       - echo "All dependencies found"
 
+  # ============================================================
+  # Bootstrap Cluster (Kind - temporary)
+  # ============================================================
   bootstrap:up:
-    desc: Create Kind bootstrap cluster
+    desc: Create Kind bootstrap cluster with Cilium
     cmds:
       - kind create cluster --config bootstrap/kind-config.yaml
       - kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
@@ -27,7 +47,6 @@ tasks:
 
   bootstrap:capi:
     desc: Install CAPI Operator and providers on bootstrap cluster
-    deps: [bootstrap:up]
     cmds:
       - helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
       - helm install capi-operator capi-operator/cluster-api-operator --namespace capi-system --create-namespace --wait --timeout 5m
@@ -38,8 +57,11 @@ tasks:
     cmds:
       - kind delete cluster --name slipway-bootstrap
 
-  mgmt:secret:
-    desc: Create Proxmox API credentials secret
+  # ============================================================
+  # Management Cluster
+  # ============================================================
+  mgmt:secrets:
+    desc: Create bootstrap secrets from .env (Proxmox creds + CF token)
     cmds:
       - |
         kubectl create namespace {{.CLUSTER_NAMESPACE}} --dry-run=client -o yaml | kubectl apply -f -
@@ -52,7 +74,6 @@ tasks:
 
   mgmt:apply:
     desc: Apply management cluster CAPI resources
-    deps: [mgmt:secret]
     cmds:
       - kubectl apply -k infrastructure/management/
 
@@ -71,11 +92,20 @@ tasks:
       - |
         clusterctl get kubeconfig {{.CLUSTER_NAME}} \
           --namespace {{.CLUSTER_NAMESPACE}} > {{.KUBECONFIG_MGMT}}
+        chmod 600 {{.KUBECONFIG_MGMT}}
         echo "Kubeconfig saved to {{.KUBECONFIG_MGMT}}"
 
-  mgmt:cilium-config:
-    desc: Apply Cilium L2 and Gateway config on management cluster
+  mgmt:cilium:
+    desc: Install Cilium and apply L2/Gateway config on management cluster
     cmds:
+      - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
+      - |
+        helm install cilium cilium/cilium \
+          --kubeconfig {{.KUBECONFIG_MGMT}} \
+          --namespace kube-system \
+          --values platform/cilium/values-base.yaml \
+          --values platform/cilium/values-management.yaml \
+          --wait --timeout 5m
       - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f platform/cilium-config/
 
   mgmt:argocd:
@@ -88,6 +118,22 @@ tasks:
           --namespace argocd --create-namespace \
           --values platform/argocd/values.yaml --wait --timeout 5m
 
+  mgmt:eso:
+    desc: Install External Secrets Operator and bootstrap secret store credential
+    cmds:
+      - |
+        helm repo add external-secrets https://charts.external-secrets.io
+        helm install external-secrets external-secrets/external-secrets \
+          --kubeconfig {{.KUBECONFIG_MGMT}} \
+          --namespace external-secrets --create-namespace \
+          --values platform/external-secrets/values.yaml --wait --timeout 5m
+      - |
+        echo "Creating bootstrap secret store credential..."
+        echo "ESO is installed. Configure your ClusterSecretStore after GitOps bootstrap."
+
+  # ============================================================
+  # Pivot
+  # ============================================================
   pivot:
     desc: Pivot CAPI from Kind to management cluster
     cmds:
@@ -96,27 +142,67 @@ tasks:
           --kubeconfig {{.KUBECONFIG_MGMT}} \
           --namespace capi-system --create-namespace --wait --timeout 5m
       - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f platform/capi-operator/providers/
-      - sleep 30
+      - echo "Waiting for CAPI providers to be ready on management cluster..."
+      - sleep 60
       - clusterctl move --to-kubeconfig {{.KUBECONFIG_MGMT}}
-      - echo "Pivot complete. You can now run 'task bootstrap:down'"
+      - echo "Pivot complete. Management cluster now manages itself."
 
+  # ============================================================
+  # GitOps
+  # ============================================================
   gitops:bootstrap:
-    desc: Apply ArgoCD root app to begin self-management
+    desc: Apply ArgoCD root app to begin full GitOps self-management
     cmds:
       - kubectl --kubeconfig {{.KUBECONFIG_MGMT}} apply -f gitops/root-app.yaml
-      - echo "Root app applied. ArgoCD will now manage everything from Git."
+      - |
+        echo ""
+        echo "=========================================="
+        echo "  GitOps bootstrap complete!"
+        echo "  ArgoCD now manages everything from Git."
+        echo "  All future changes go through Git."
+        echo "=========================================="
 
+  # ============================================================
+  # Full Bootstrap (end-to-end)
+  # ============================================================
   full-bootstrap:
-    desc: Full bootstrap sequence (Kind -> mgmt cluster -> pivot -> GitOps)
+    desc: "Full bootstrap: Kind -> mgmt cluster -> pivot -> GitOps"
     cmds:
-      - task: deps
+      - task: init
       - task: bootstrap:up
       - task: bootstrap:capi
+      - task: mgmt:secrets
       - task: mgmt:apply
       - task: mgmt:wait
       - task: mgmt:kubeconfig
-      - task: mgmt:cilium-config
+      - task: mgmt:cilium
       - task: mgmt:argocd
+      - task: mgmt:eso
       - task: pivot
       - task: bootstrap:down
       - task: gitops:bootstrap
+
+  # ============================================================
+  # Utilities
+  # ============================================================
+  mgmt:dashboard:
+    desc: Get ArgoCD admin password and URL
+    cmds:
+      - |
+        echo "ArgoCD URL: https://$(kubectl --kubeconfig {{.KUBECONFIG_MGMT}} get svc -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+        echo "Admin password:"
+        kubectl --kubeconfig {{.KUBECONFIG_MGMT}} -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+        echo ""
+
+  status:
+    desc: Show cluster and CAPI status
+    cmds:
+      - |
+        echo "=== Clusters ==="
+        kubectl --kubeconfig {{.KUBECONFIG_MGMT}} get clusters -A
+        echo ""
+        echo "=== Machines ==="
+        kubectl --kubeconfig {{.KUBECONFIG_MGMT}} get machines -A
+        echo ""
+        echo "=== ArgoCD Apps ==="
+        kubectl --kubeconfig {{.KUBECONFIG_MGMT}} get applications -n argocd

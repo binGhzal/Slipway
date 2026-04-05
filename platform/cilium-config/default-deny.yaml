@@ -1,0 +1,30 @@
+# Default-deny CiliumClusterwideNetworkPolicy
+# All traffic is denied unless explicitly allowed.
+# Use Hubble to observe policy verdicts before enforcement.
+#
+# To test in audit mode first:
+#   kubectl annotate ccnp default-deny io.cilium.policy/audit-mode=enabled
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  description: "Default deny all ingress and egress traffic"
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - cluster
+  egress:
+    - toEntities:
+        - cluster
+        - world
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP

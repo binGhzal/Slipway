@@ -1,0 +1,15 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: slipway-mgmt-workers
+spec:
+  clusterName: slipway-mgmt
+  replicas: 0
+  template:
+    spec:
+      clusterName: slipway-mgmt
+      bootstrap:
+        configRef:
+          name: slipway-mgmt-workers
+      infrastructureRef:
+        name: slipway-mgmt-workers

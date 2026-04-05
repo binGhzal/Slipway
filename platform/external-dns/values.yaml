@@ -5,6 +5,7 @@ external-dns:
   sources:
     - gateway-httproute
     - gateway-grpcroute
+    - gateway-tlsroute
     - service
   txtOwnerId: slipway-mgmt
   env:

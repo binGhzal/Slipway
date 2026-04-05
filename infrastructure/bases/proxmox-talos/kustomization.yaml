@@ -5,3 +5,6 @@ resources:
   - proxmox-cluster.yaml
   - control-plane.yaml
   - machine-template.yaml
+  - worker-config.yaml
+  - worker-machine-template.yaml
+  - machine-deployment.yaml
