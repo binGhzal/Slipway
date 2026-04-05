@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-security
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            slipway.io/security: "true"
+  template:
+    metadata:
+      name: '{{name}}-security'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/binGhzal/Slipway.git
+          targetRevision: main
+          path: platform/kyverno
+          helm:
+            valueFiles:
+              - values.yaml
+        - repoURL: https://github.com/binGhzal/Slipway.git
+          targetRevision: main
+          path: platform/tetragon
+          helm:
+            valueFiles:
+              - values.yaml
+      destination:
+        server: '{{server}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

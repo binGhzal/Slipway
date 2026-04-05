@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-observability
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            slipway.io/observability: "true"
+  template:
+    metadata:
+      name: '{{name}}-observability'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/binGhzal/Slipway.git
+        targetRevision: main
+        path: platform/grafana-alloy
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: '{{server}}'
+        namespace: monitoring
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

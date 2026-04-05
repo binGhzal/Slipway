@@ -1,0 +1,50 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "kubernetes": {
+    "fileMatch": [
+      "infrastructure/.+\\.ya?ml$",
+      "platform/.+\\.ya?ml$",
+      "apps/.+\\.ya?ml$",
+      "gitops/.+\\.ya?ml$"
+    ]
+  },
+  "helm-values": {
+    "fileMatch": ["platform/.+values.*\\.ya?ml$"]
+  },
+  "packageRules": [
+    {
+      "description": "Auto-merge patch updates after 14 days",
+      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "automerge": true,
+      "minimumReleaseAge": "14 days"
+    },
+    {
+      "description": "Auto-merge minor updates after 14 days for non-critical",
+      "matchUpdateTypes": ["minor"],
+      "automerge": true,
+      "minimumReleaseAge": "14 days",
+      "excludePackagePatterns": ["cilium", "kyverno", "cert-manager", "argo-cd", "external-secrets"]
+    },
+    {
+      "description": "Require manual approval for major updates",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "Never auto-merge security-critical components",
+      "matchPackagePatterns": ["cilium", "kyverno", "cert-manager", "argo-cd", "external-secrets", "tetragon"],
+      "automerge": false
+    },
+    {
+      "description": "Group monitoring updates",
+      "matchPackagePatterns": ["prometheus", "grafana", "loki", "tempo", "alloy"],
+      "groupName": "monitoring"
+    },
+    {
+      "description": "Group security scanning updates",
+      "matchPackagePatterns": ["trivy", "kubescape", "tetragon"],
+      "groupName": "security-scanning"
+    }
+  ]
+}

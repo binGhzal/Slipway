@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - clusters:
+              selector:
+                matchLabels:
+                  slipway.io/apps: "true"
+          - git:
+              repoURL: https://github.com/binGhzal/Slipway.git
+              revision: main
+              directories:
+                - path: apps/{{name}}/*
+  template:
+    metadata:
+      name: '{{name}}-{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/binGhzal/Slipway.git
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: '{{server}}'
+        namespace: '{{path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

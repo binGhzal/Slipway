@@ -1,0 +1,9 @@
+trivy-operator:
+  trivy:
+    ignoreUnfixed: true
+  operator:
+    scanJobsConcurrentLimit: 3
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi

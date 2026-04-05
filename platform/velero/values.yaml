@@ -1,0 +1,24 @@
+velero:
+  configuration:
+    backupStorageLocation:
+      - name: default
+        provider: aws
+        bucket: "" # Set to your S3 bucket name
+        config:
+          region: "" # Set to your S3 region
+          s3ForcePathStyle: true
+          s3Url: "" # Set to your S3-compatible endpoint
+    volumeSnapshotLocation:
+      - name: default
+        provider: aws
+        config:
+          region: "" # Set to your S3 region
+  credentials:
+    useSecret: true
+    secretContents: {}
+  initContainers:
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws:v1.10.0
+      volumeMounts:
+        - mountPath: /target
+          name: plugins

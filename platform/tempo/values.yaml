@@ -1,0 +1,11 @@
+tempo:
+  tempo:
+    storage:
+      trace:
+        backend: local # Switch to s3 for production
+        local:
+          path: /var/tempo/traces
+    retention: 72h
+  persistence:
+    enabled: true
+    size: 10Gi

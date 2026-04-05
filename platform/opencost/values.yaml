@@ -1,0 +1,11 @@
+opencost:
+  opencost:
+    exporter:
+      defaultClusterId: slipway-mgmt
+    prometheus:
+      internal:
+        serviceName: kube-prometheus-stack-prometheus
+        namespaceName: monitoring
+        port: 9090
+    ui:
+      enabled: true

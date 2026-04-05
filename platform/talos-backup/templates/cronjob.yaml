@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: talos-backup
+  labels:
+    app.kubernetes.io/name: talos-backup
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: talos-backup
+              image: ghcr.io/siderolabs/talos-backup:latest
+              args:
+                - --s3-bucket=$(S3_BUCKET)
+                - --s3-endpoint=$(S3_ENDPOINT)
+                - --s3-region=$(S3_REGION)
+              env:
+                - name: S3_BUCKET
+                  value: "" # Set per deployment
+                - name: S3_ENDPOINT
+                  value: "" # Set per deployment
+                - name: S3_REGION
+                  value: "" # Set per deployment
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: talos-backup-s3-credentials
+                      key: access-key-id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: talos-backup-s3-credentials
+                      key: secret-access-key
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi

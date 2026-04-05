@@ -1,0 +1,15 @@
+external-dns:
+  provider:
+    name: cloudflare
+  policy: sync
+  sources:
+    - gateway-httproute
+    - gateway-grpcroute
+    - service
+  txtOwnerId: slipway-mgmt
+  env:
+    - name: CF_API_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: cloudflare-api-token
+          key: api-token

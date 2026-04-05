@@ -1,0 +1,4 @@
+apiVersion: v2
+name: talos-backup
+version: 0.1.0
+description: Talos etcd backup CronJob (raw manifests, no upstream chart dependency)
