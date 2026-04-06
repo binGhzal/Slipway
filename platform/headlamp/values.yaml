@@ -1,8 +1,0 @@
-headlamp:
-  replicaCount: 1
-  config:
-    baseURL: ""
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi

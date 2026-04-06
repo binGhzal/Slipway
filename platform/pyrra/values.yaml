@@ -1,5 +1,0 @@
-# Pyrra - no official Helm chart.
-# Configuration managed via raw manifests in templates/.
-pyrra:
-  image: ghcr.io/pyrra-dev/pyrra:latest
-  prometheusUrl: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090

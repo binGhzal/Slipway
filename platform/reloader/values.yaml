@@ -1,7 +1,0 @@
-reloader:
-  reloader:
-    watchGlobally: true
-    resources:
-      requests:
-        cpu: 50m
-        memory: 64Mi

@@ -1,0 +1,35 @@
+---
+extends: default
+
+rules:
+  # Allow longer lines — YAML often has long strings (URLs, commands, etc.)
+  line-length:
+    max: 200
+    level: warning
+
+  # Helm templates use {{ }} which yamllint flags as extra spaces in braces.
+  # These files are excluded via ignore-path patterns below.
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+
+  # Allow inline comments
+  comments:
+    min-spaces-from-content: 1
+
+  # Allow files without document start marker (---)
+  document-start: disable
+
+  # Allow both true/false and yes/no
+  truthy: disable
+
+  # Indentation: 2 spaces
+  indentation:
+    spaces: 2
+    indent-sequences: true
+
+ignore: |
+  platform/*/templates/
+  .git/
+  .env
+  .env.example

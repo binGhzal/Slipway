@@ -1,7 +1,0 @@
-kubescape-operator:
-  capabilities:
-    continuousScan: enable
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi

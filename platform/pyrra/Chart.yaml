@@ -1,4 +1,0 @@
-apiVersion: v2
-name: pyrra
-version: 0.1.0
-description: Pyrra SLO manager (raw manifests, no official Helm chart)

@@ -1,7 +1,0 @@
-# Cloudflared has no upstream Helm chart dependency.
-# Configuration is managed via raw manifests in templates/.
-cloudflared:
-  image: cloudflare/cloudflared:latest
-  replicas: 2
-  tunnelTokenSecret: cloudflared-tunnel-token
-  tunnelTokenKey: token

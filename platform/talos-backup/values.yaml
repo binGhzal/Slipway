@@ -1,9 +1,0 @@
-# Talos backup - no upstream Helm chart.
-# Configuration managed via raw CronJob manifest in templates/.
-talos-backup:
-  image: ghcr.io/siderolabs/talos-backup:latest
-  schedule: "0 */6 * * *"
-  s3Bucket: "" # Set to your S3 bucket
-  s3Endpoint: "" # Set to your S3-compatible endpoint
-  s3Region: "" # Set to your S3 region
-  secretName: talos-backup-s3-credentials

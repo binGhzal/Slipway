@@ -1,3 +1,0 @@
-cilium:
-  k8sServiceHost: "" # Set per cluster
-  k8sServicePort: 6443

@@ -1,9 +1,0 @@
-# Proxmox CSI plugin - placeholder values
-# No official Helm chart; raw manifests or community chart will be used.
-# See: https://github.com/sergelogvinov/proxmox-csi-plugin
-proxmox-csi:
-  image: ghcr.io/sergelogvinov/proxmox-csi-plugin:latest
-  storageClassName: proxmox
-  clusterName: slipway-mgmt
-  # Proxmox connection details are provided via secret
-  secretName: proxmox-csi-credentials
